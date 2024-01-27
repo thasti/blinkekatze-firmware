@@ -30,7 +30,74 @@
 #define ADDRESS		0x55
 #define CHIP_ID		0x0546
 
+#define BQ27546_STUB
+
 static const char *TAG = "BQ27546";
+
+#ifdef BQ27546_STUB
+esp_err_t bq27546_init(bq27546_t *bq, i2c_bus_t *bus) {
+	static int first_call = 1;
+
+	if (first_call) {
+		first_call = 0;
+		ESP_LOGE(TAG, "Gauge simulator: FAIL");
+		return ESP_FAIL;
+	}
+
+	ESP_LOGE(TAG, "Gauge simulator: OK");
+	return ESP_OK;
+}
+
+esp_err_t bq27546_write_flash(bq27546_t *bq, const bq27546_flash_op_t *flash_ops, size_t num_ops) {
+	return ESP_OK;
+}
+
+int bq27546_get_voltage_mv(bq27546_t *bq) {
+	return 4000;
+}
+
+esp_err_t bq27546_get_current_ma(bq27546_t *bq, int *current_ma_out) {
+	*current_ma_out = 1000;
+	return ESP_OK;
+}
+
+int bq27546_get_state_of_charge_percent(bq27546_t *bq) {
+	return 100;
+}
+
+int bq27546_get_state_of_health_percent(bq27546_t *bq) {
+	return 100;
+}
+
+int bq27546_get_time_to_empty_min(bq27546_t *bq) {
+	return 60;
+}
+
+int bq27546_get_temperature_0_1k(bq27546_t *bq) {
+	return 3000;
+}
+
+int bq27546_get_full_charge_capacity_mah(bq27546_t *bq) {
+	return 3700;
+}
+
+int bq27546_get_remaining_capacity_mah(bq27546_t *bq) {
+	return 3700;
+}
+
+int bq27546_is_sealed(bq27546_t *bq) {
+	return 1;
+}
+
+esp_err_t bq27546_seal(bq27546_t *bq) {
+	return ESP_OK;
+}
+
+esp_err_t bq27546_it_enable(bq27546_t *bq) {
+	return ESP_OK;
+}
+
+#else
 
 static void lock(bq27546_t *bq) {
 	xSemaphoreTake(bq->lock, portMAX_DELAY);
@@ -274,3 +341,4 @@ esp_err_t bq27546_seal(bq27546_t *bq) {
 esp_err_t bq27546_it_enable(bq27546_t *bq) {
 	return run_subcmd(bq, CMD_CONTROL, SUBCMD_IT_ENABLE);
 }
+#endif
